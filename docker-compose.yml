@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  facets-frontend:
+    build: .
+    ports:
+      - "8082:80"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    
+  # Development service (optional)
+  facets-frontend-dev:
+    image: node:18-alpine
+    working_dir: /app
+    ports:
+      - "5173:5173"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    command: sh -c "npm install && npm run dev -- --host"
+    profiles:
+      - dev
+    restart: unless-stopped
