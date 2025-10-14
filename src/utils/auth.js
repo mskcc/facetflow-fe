@@ -17,7 +17,7 @@ export const tokenStorage = {
 };
 
 export const api = {
-  baseURL: import.meta.env.FACETS_SERVICE_BASE_URL || 'http://localhost:8080',
+  baseURL: import.meta.env.VITE_FACETS_SERVICE_BASE_URL || 'http://localhost:8080',
 
   async login(username, password) {
     const response = await fetch(`${this.baseURL}/api/token/`, {
