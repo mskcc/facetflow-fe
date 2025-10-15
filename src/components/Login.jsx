@@ -61,7 +61,7 @@ export default function Login({ onLoginSuccess }) {
         <div style={{ textAlign: 'center', marginBottom: '30px' }}>
           <img src={logoStacked} alt="MSKCC Logo" style={{ maxWidth: '200px', height: 'auto' }} />
         </div>
-        <h2 style={{ marginBottom: '25px', textAlign: 'center' }}>Welcome to FacetsFlow</h2>
+        <h2 style={{ marginBottom: '25px', textAlign: 'center' }}>Welcome to FacetFlow</h2>
         <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: '5px', display: 'flex', justifyContent: 'center' }}>
           <TextInput

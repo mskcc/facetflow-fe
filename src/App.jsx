@@ -17,7 +17,7 @@ function App() {
     <div className={`App ${!isLoggedIn ? 'login-view' : ''}`}>
       <Header
         maxWidth='max'
-        productName='FacetsFlow'
+        productName='FacetFlow'
         controls={
           isLoggedIn && (
             <Button kind="primary" onClick={handleLogout}>
