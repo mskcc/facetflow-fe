@@ -91,7 +91,7 @@ export default function SessionsTable() {
         }}>
           Error: {error}
         </div>
-        <button onClick={handleRefresh}>Retry</button>
+        <Button onClick={handleRefresh}>Retry</Button>
       </div>
     );
   }
@@ -215,7 +215,7 @@ export default function SessionsTable() {
                         </Button>
                       )}
                       {canStop && (
-                        <button
+                        <Button
                           onClick={() => handleSessionAction(session.id, 'stop')}
                           disabled={isLoading}
                           style={{
@@ -229,7 +229,7 @@ export default function SessionsTable() {
                           }}
                         >
                           {isLoading ? 'Stopping...' : 'Stop'}
-                        </button>
+                        </Button>
                       )}
                       {!canStart && !canStop && '-'}
                     </td>

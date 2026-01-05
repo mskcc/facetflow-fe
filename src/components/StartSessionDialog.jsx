@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { api } from '../utils/auth';
+import { Button } from '@mskcc/components-react';
 
 export default function StartSessionDialog({ isOpen, onClose, onSessionStarted }) {
   const [formData, setFormData] = useState({
@@ -151,7 +152,7 @@ export default function StartSessionDialog({ isOpen, onClose, onSessionStarted }
           )}
 
           <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-            <button
+            <Button
               type="button"
               onClick={handleClose}
               disabled={loading}
@@ -166,8 +167,8 @@ export default function StartSessionDialog({ isOpen, onClose, onSessionStarted }
               }}
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
               disabled={loading || !formData.name.trim()}
               style={{
@@ -181,7 +182,7 @@ export default function StartSessionDialog({ isOpen, onClose, onSessionStarted }
               }}
             >
               {loading ? 'Starting...' : 'Start Session'}
-            </button>
+            </Button>
           </div>
         </form>
       </div>
