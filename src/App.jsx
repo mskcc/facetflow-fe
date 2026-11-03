@@ -2,14 +2,14 @@ import { useState } from 'react'
 import Login from './components/Login'
 import SessionsTable from './components/SessionsTable'
 import { Header, Button, Footer } from '@mskcc/components-react'
-import { tokenStorage } from './utils/auth'
+import { api, tokenStorage } from './utils/auth'
 import './App.scss'
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(!!tokenStorage.getToken())
 
   const handleLogout = () => {
-    tokenStorage.clearTokens()
+    api.logout()
     setIsLoggedIn(false)
   }
 

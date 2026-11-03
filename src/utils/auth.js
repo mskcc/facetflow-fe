@@ -16,16 +16,47 @@ export const tokenStorage = {
   }
 };
 
+const keycloak = {
+  url: import.meta.env.VITE_KEYCLOAK_URL || 'http://localhost:8080',
+  realm: import.meta.env.VITE_KEYCLOAK_REALM || 'facetflow',
+  clientId: import.meta.env.VITE_KEYCLOAK_CLIENT_ID || 'facetflow-fe',
+  clientSecret: import.meta.env.VITE_KEYCLOAK_CLIENT_SECRET,
+};
+
+const keycloakOidcURL = `${keycloak.url}/realms/${keycloak.realm}/protocol/openid-connect`;
+
+async function requestKeycloakToken(params) {
+  console.log('Keycloak token URL:', `${keycloakOidcURL}/token`);
+  console.log('Keycloak config:', keycloak);
+
+  const bodyParams = {
+    client_id: keycloak.clientId,
+    ...params
+  };
+
+  // Add client_secret if it's configured (for confidential clients)
+  if (keycloak.clientSecret) {
+    bodyParams.client_secret = keycloak.clientSecret;
+  }
+
+  return fetch(`${keycloakOidcURL}/token`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: new URLSearchParams(bodyParams),
+  });
+}
+
 export const api = {
   baseURL: import.meta.env.VITE_FACETS_SERVICE_BASE_URL || 'http://localhost:8080',
 
   async login(username, password) {
-    const response = await fetch(`${this.baseURL}/api/token/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ username, password }),
+    const response = await requestKeycloakToken({
+      grant_type: 'password',
+      scope: 'openid',
+      username,
+      password,
     });
 
     if (!response.ok) {
@@ -33,7 +64,7 @@ export const api = {
     }
 
     const data = await response.json();
-    tokenStorage.setTokens(data.access, data.refresh);
+    tokenStorage.setTokens(data.access_token, data.refresh_token);
     return data;
   },
 
@@ -43,12 +74,9 @@ export const api = {
       throw new Error('No refresh token available');
     }
 
-    const response = await fetch(`${this.baseURL}/api/token/refresh/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ refresh: refreshToken }),
+    const response = await requestKeycloakToken({
+      grant_type: 'refresh_token',
+      refresh_token: refreshToken,
     });
 
     if (!response.ok) {
@@ -57,7 +85,7 @@ export const api = {
     }
 
     const data = await response.json();
-    tokenStorage.setTokens(data.access, tokenStorage.getRefreshToken());
+    tokenStorage.setTokens(data.access_token, data.refresh_token);
     return data;
   },
 
@@ -67,15 +95,29 @@ export const api = {
       throw new Error('No token available');
     }
 
-    const response = await fetch(`${this.baseURL}/api/token/verify/`, {
-      method: 'POST',
+    const response = await fetch(`${keycloakOidcURL}/userinfo`, {
       headers: {
-        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
       },
-      body: JSON.stringify({ token }),
     });
 
     return response.ok;
+  },
+
+  async logout() {
+    const refreshToken = tokenStorage.getRefreshToken();
+    tokenStorage.clearTokens();
+    if (!refreshToken) {
+      return;
+    }
+
+    await fetch(`${keycloakOidcURL}/logout`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({ client_id: keycloak.clientId, refresh_token: refreshToken }),
+    }).catch(() => {});
   },
 
   async makeAuthenticatedRequest(url, options = {}) {

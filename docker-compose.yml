@@ -5,7 +5,10 @@ services:
     build:
       context: .
       args:
-        - VITE_FACETS_SERVICE_BASE_URL=${FACETS_SERVICE_BASE_URL:-http://localhost:8080}
+        - VITE_FACETS_SERVICE_BASE_URL=${FACETS_SERVICE_BASE_URL:-http://localhost:8000}
+        - VITE_KEYCLOAK_URL=${KEYCLOAK_URL:-http://localhost:8080}
+        - VITE_KEYCLOAK_REALM=${KEYCLOAK_REALM:-facets}
+        - VITE_KEYCLOAK_CLIENT_ID=${KEYCLOAK_CLIENT_ID:-facetsflow-service}
     ports:
       - "8082:80"
     environment:
